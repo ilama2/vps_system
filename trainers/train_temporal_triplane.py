@@ -4,7 +4,7 @@ import torch
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+sys.path.append(0,os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from utils.geometry import depth_to_world_coords, get_7scenes_intrinsics
 from datasets.seven_scenes_temporal import SevenScenesTemporalDataset
