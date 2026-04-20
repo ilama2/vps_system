@@ -21,14 +21,18 @@ def main():
         device = "cpu"
 
     print("Using device:", device)
+    data_root = os.environ.get(
+        "DATA_ROOT",
+        "/content/drive/MyDrive/chess"
+    )
 
     dataset = SevenScenesTemporalDataset(
-        root="/content/drive/MyDrive/chess",
+        root=data_root,
         T=4,
         image_size=(224, 224),
         skip_short_history=False,
     )
-
+    
     loader = DataLoader(
         dataset,
         batch_size=2,
