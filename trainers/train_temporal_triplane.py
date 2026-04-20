@@ -23,7 +23,7 @@ def main():
     print("Using device:", device)
 
     dataset = SevenScenesTemporalDataset(
-        root="/Users/lama/Desktop/aceg_diffusion/7scenes_raw/chess",
+        root="https://drive.google.com/drive/folders/1Zxf1uvh5Sh1nDldnuZYvL4L2w6i_pW5r?usp=sharing",
         T=4,
         image_size=(224, 224),
         skip_short_history=False,
