@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from datasets.seven_scenes_temporal import SevenScenesTemporalDataset
+from mydatasets.seven_scenes_temporal import SevenScenesTemporalDataset
 from models.temporal_triplane_model import TemporalTriPlaneModel
 
 
