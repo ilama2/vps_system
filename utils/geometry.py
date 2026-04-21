@@ -53,11 +53,11 @@ def depth_to_world_coords(depth, pose, intrinsics):
     return world_points, valid_mask
 
 
-def get_7scenes_intrinsics(batch_size, device):
-    fx = 585.0
-    fy = 585.0
-    cx = 320.0
-    cy = 240.0
+def get_scaled_7scenes_intrinsics(batch_size, device, orig_w=640, orig_h=480, new_w=224, new_h=224):
+    fx = 585.0 * (new_w / orig_w)
+    fy = 585.0 * (new_h / orig_h)
+    cx = 320.0 * (new_w / orig_w)
+    cy = 240.0 * (new_h / orig_h)
 
     K = torch.tensor([
         [fx, 0.0, cx],
