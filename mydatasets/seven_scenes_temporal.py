@@ -10,7 +10,7 @@ class SevenScenesTemporalDataset(Dataset):
         self,
         root,
         T=4,
-        image_size=(224, 224),
+        image_size=(320, 240),
         skip_short_history=False,
     ):
         self.root = root
@@ -67,6 +67,10 @@ class SevenScenesTemporalDataset(Dataset):
             img = cv2.resize(img, self.image_size)
 
         img = torch.from_numpy(img).permute(2, 0, 1).float() / 255.0
+        mean = torch.tensor([0.485, 0.456, 0.406]).view(3,1,1)
+        std  = torch.tensor([0.229, 0.224, 0.225]).view(3,1,1)
+        
+        img = (img - mean) / std
         return img
     def load_depth(self, path):
         depth = cv2.imread(path, cv2.IMREAD_UNCHANGED)
