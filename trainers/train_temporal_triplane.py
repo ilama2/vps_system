@@ -142,11 +142,15 @@ def main():
             optimizer.step()
 
             total_loss += loss.item()
-
+            
             if batch_idx % 10 == 0:
                 print(
                     f"Epoch {epoch} | Batch {batch_idx} | "
-                    f"Loss {loss.item():.6f}"
+                    f"Loss {loss.item():.6f} | "
+                    f"Coord {loss_coord.item():.6f} | "
+                    f"Reproj {loss_reproj.item():.6f} | "
+                    f"Conf {loss_conf.item():.6f} | "
+                    f"Reg {loss_reg.item():.6f}"
                 )
 
         avg_loss = total_loss / (batch_idx + 1)
