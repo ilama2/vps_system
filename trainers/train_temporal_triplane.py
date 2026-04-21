@@ -98,7 +98,10 @@ def main():
             pred_coords, pred_conf, coarse_xyz = model(frames)
             _, _, _, out_h, out_w = pred_coords.shape
 
-            intrinsics = get_7scenes_intrinsics(depth.shape[0], device)
+            intrinsics = get_scaled_7scenes_intrinsics(
+                depth.shape[0], device,
+                args.image_h, args.image_w
+            )
 
             gt_coords_full, valid_mask_full = depth_to_world_coords(depth, pose, intrinsics)
 
