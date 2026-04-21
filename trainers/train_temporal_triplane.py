@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from utils.geometry import depth_to_world_coords, get_7scenes_intrinsics
+from utils.geometry import depth_to_world_coords ,get_scaled_7scenes_intrinsics
 from mydatasets.seven_scenes_temporal import SevenScenesTemporalDataset
 from models.temporal_triplane_model import TemporalTriPlaneModel
 from losses.multi_hypothesis_losses import multi_hypothesis_coordinate_loss, coarse_xyz_regularization
