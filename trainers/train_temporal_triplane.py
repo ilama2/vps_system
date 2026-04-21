@@ -73,15 +73,6 @@ def main():
 
             intrinsics = get_7scenes_intrinsics(depth.shape[0], device)
 
-            print("depth shape:", depth.shape)
-            print("pose shape:", pose.shape)
-            print("pred_coords shape:", pred_coords.shape)
-            print("out_h, out_w:", out_h, out_w)
-
-            gt_coords_full, valid_mask_full = depth_to_world_coords(depth, pose, intrinsics)
-
-            print("gt_coords_full shape:", gt_coords_full.shape)
-            print("valid_mask_full shape:", valid_mask_full.shape)
             gt_coords_full, valid_mask_full = depth_to_world_coords(depth, pose, intrinsics)
 
             gt_coords = F.interpolate(
