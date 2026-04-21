@@ -1,14 +1,26 @@
 import os
 import sys
 import cv2
+import argparse
 import torch
 import numpy as np
-import matplotlib.pyplot as plt
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from mydatasets.seven_scenes_temporal import SevenScenesTemporalDataset
 from models.temporal_triplane_model import TemporalTriPlaneModel
+
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--data_root", type=str, required=True)
+    parser.add_argument("--ckpt", type=str, required=True)
+    parser.add_argument("--image_h", type=int, default=224)
+    parser.add_argument("--image_w", type=int, default=224)
+    parser.add_argument("--history", type=int, default=4)
+    parser.add_argument("--topk", type=int, default=512)
+    parser.add_argument("--sample_idx", type=int, default=0)
+    return parser.parse_args()
 
 
 def get_scaled_7scenes_intrinsics(orig_w=640, orig_h=480, new_w=224, new_h=224):
@@ -22,25 +34,21 @@ def get_scaled_7scenes_intrinsics(orig_w=640, orig_h=480, new_w=224, new_h=224):
         [0.0, fy, cy],
         [0.0, 0.0, 1.0],
     ], dtype=np.float32)
-
     return K
 
+
 def extract_topk_correspondences(coords, conf, image_h=224, image_w=224, topk=512, min_conf=0.2):
-    """
-    coords: [K, 3, H, W]
-    conf:   [K, H, W]
-    """
     K, _, Hf, Wf = coords.shape
 
-    best_idx = conf.argmax(dim=0)         # [H,W]
-    best_scores = conf.max(dim=0).values  # [H,W]
+    best_idx = conf.argmax(dim=0)
+    best_scores = conf.max(dim=0).values
 
     coords_perm = coords.permute(2, 3, 0, 1)  # [H,W,K,3]
 
     row_ids = torch.arange(Hf).unsqueeze(1).expand(Hf, Wf)
     col_ids = torch.arange(Wf).unsqueeze(0).expand(Hf, Wf)
 
-    best_coords = coords_perm[row_ids, col_ids, best_idx]   # [H,W,3]
+    best_coords = coords_perm[row_ids, col_ids, best_idx]  # [H,W,3]
 
     ys, xs = np.meshgrid(np.arange(Hf), np.arange(Wf), indexing="ij")
     xs = (xs + 0.5) * (image_w / Wf)
@@ -62,7 +70,6 @@ def extract_topk_correspondences(coords, conf, image_h=224, image_w=224, topk=51
         raise ValueError("No correspondences survived confidence filtering.")
 
     idx = np.argsort(-scores)[:topk]
-
     return image_points[idx], object_points[idx], scores[idx]
 
 
@@ -101,12 +108,13 @@ def translation_error(t_pred, t_gt):
 
 
 def main():
-    device = "cpu"
+    args = parse_args()
+    device = "cuda" if torch.cuda.is_available() else "cpu"
 
     dataset = SevenScenesTemporalDataset(
-        root="/content/drive/MyDrive/chess",
-        T=4,
-        image_size=(224, 224),
+        root=args.data_root,
+        T=args.history,
+        image_size=(args.image_w, args.image_h),
         skip_short_history=False,
     )
 
@@ -120,28 +128,27 @@ def main():
         num_hypotheses=4,
     ).to(device)
 
-    ckpt = "checkpoints/temporal_triplane_epoch_5.pth"
-    model.load_state_dict(torch.load(ckpt, map_location=device))
+    model.load_state_dict(torch.load(args.ckpt, map_location=device))
     model.eval()
 
-    sample = dataset[0]
+    sample = dataset[args.sample_idx]
     frames = sample["frames"].unsqueeze(0).to(device)
     gt_pose = sample["pose"].numpy()
 
     with torch.no_grad():
         coords, conf, _ = model(frames)
-        coords = coords[0]  # [K,3,H,W]
-        conf = conf[0]      # [K,H,W]
+        coords = coords[0]
+        conf = conf[0]
 
     image_points, object_points, scores = extract_topk_correspondences(
         coords,
         conf,
-        image_h=224,
-        image_w=224,
-        topk=512,
+        image_h=args.image_h,
+        image_w=args.image_w,
+        topk=args.topk,
     )
 
-    Kmat = get_scaled_7scenes_intrinsics(640, 480, 224, 224)
+    Kmat = get_scaled_7scenes_intrinsics(640, 480, args.image_w, args.image_h)
     success, R_pred, t_pred, inliers = solve_pose_pnp_ransac(image_points, object_points, Kmat)
 
     if not success:
