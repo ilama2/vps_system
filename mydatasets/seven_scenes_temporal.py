@@ -10,8 +10,8 @@ class SevenScenesTemporalDataset(Dataset):
         self,
         root,
         T=4,
-        image_size=(320, 240),
-        skip_short_history=False,
+        image_size=(256, 192),
+        skip_short_history=True,
     ):
         self.root = root
         self.T = T
