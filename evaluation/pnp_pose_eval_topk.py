@@ -104,7 +104,7 @@ def main():
     device = "cpu"
 
     dataset = SevenScenesTemporalDataset(
-        root="/Users/lama/Desktop/aceg_diffusion/7scenes_raw/chess",
+        root="/content/drive/MyDrive/chess",
         T=4,
         image_size=(224, 224),
         skip_short_history=False,
@@ -120,7 +120,7 @@ def main():
         num_hypotheses=4,
     ).to(device)
 
-    ckpt = "checkpoints/temporal_triplane_epoch_0.pth"
+    ckpt = "checkpoints/temporal_triplane_epoch_5.pth"
     model.load_state_dict(torch.load(ckpt, map_location=device))
     model.eval()
 
