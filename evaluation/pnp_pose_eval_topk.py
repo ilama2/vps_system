@@ -25,29 +25,22 @@ def get_scaled_7scenes_intrinsics(orig_w=640, orig_h=480, new_w=224, new_h=224):
 
     return K
 
-
-def extract_topk_correspondences(coords, conf, image_h=224, image_w=224, topk=512):
+def extract_topk_correspondences(coords, conf, image_h=224, image_w=224, topk=512, min_conf=0.2):
     """
     coords: [K, 3, H, W]
     conf:   [K, H, W]
-
-    returns:
-        image_points [N,2]
-        object_points [N,3]
-        scores [N]
     """
     K, _, Hf, Wf = coords.shape
 
-    # choose best hypothesis at each location
-    best_idx = conf.argmax(dim=0)  # [H,W]
+    best_idx = conf.argmax(dim=0)         # [H,W]
     best_scores = conf.max(dim=0).values  # [H,W]
 
     coords_perm = coords.permute(2, 3, 0, 1)  # [H,W,K,3]
-    best_coords = coords_perm[
-        torch.arange(Hf).unsqueeze(1),
-        torch.arange(Wf).unsqueeze(0),
-        best_idx
-    ]  # [H,W,3]
+
+    row_ids = torch.arange(Hf).unsqueeze(1).expand(Hf, Wf)
+    col_ids = torch.arange(Wf).unsqueeze(0).expand(Hf, Wf)
+
+    best_coords = coords_perm[row_ids, col_ids, best_idx]   # [H,W,3]
 
     ys, xs = np.meshgrid(np.arange(Hf), np.arange(Wf), indexing="ij")
     xs = (xs + 0.5) * (image_w / Wf)
@@ -59,12 +52,17 @@ def extract_topk_correspondences(coords, conf, image_h=224, image_w=224, topk=51
 
     valid = np.isfinite(object_points).all(axis=1)
     valid &= np.linalg.norm(object_points, axis=1) > 1e-6
+    valid &= scores > min_conf
 
     image_points = image_points[valid]
     object_points = object_points[valid]
     scores = scores[valid]
 
+    if len(scores) == 0:
+        raise ValueError("No correspondences survived confidence filtering.")
+
     idx = np.argsort(-scores)[:topk]
+
     return image_points[idx], object_points[idx], scores[idx]
 
 
