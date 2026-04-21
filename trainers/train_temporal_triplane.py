@@ -60,7 +60,7 @@ def main():
 
     model.train()
 
-    for epoch in range(1):
+    for epoch in range(20):
         total_loss = 0.0
 
         for batch_idx, batch in enumerate(loader):
@@ -104,8 +104,7 @@ def main():
                     f"Loss {loss.item():.6f} | Main {loss_main.item():.6f} | Reg {loss_reg.item():.6f}"
                 )
 
-            if batch_idx == 200:
-                break
+
 
         avg_loss = total_loss / (batch_idx + 1)
         print(f"Epoch {epoch} done | Avg Loss {avg_loss:.6f}")
