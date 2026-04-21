@@ -74,9 +74,9 @@ def solve_pose_pnp_ransac(image_points, object_points, K):
         imagePoints=image_points,
         cameraMatrix=K,
         distCoeffs=dist_coeffs,
-        iterationsCount=1000,
+        iterationsCount=2000,
         reprojectionError=3.0,
-        confidence=0.99,
+        confidence=0.999,
         flags=cv2.SOLVEPNP_EPNP,
     )
 
