@@ -1,9 +1,0 @@
-numpy
-torch
-scipy
-scikit-image
-joblib
-torch
-torchvision
-opencv-python
-numpy
