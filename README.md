@@ -31,19 +31,28 @@ Images
 → Pose Evaluation
 
 ---
+# ACE-G Acknowledgment
 
-## Repository Structure
+This project is built upon the ACE-G framework developed by the original authors.
 
-```text
-.
-├── scripts/
-│   ├── run_colmap.sh
-│   ├── train_aceg.sh
-│   ├── convert_to_aceg.py
-│   └── split_dataset.py
-│
-│
-├── configs/
-│   └── aceg_custom.yaml
-│
-└── README.md
+ACE-G is an advanced visual relocalization framework based on Scene Coordinate Regression and transformer-based mapping.
+
+Full credit belongs to the ACE-G authors and contributors.
+
+## Official ACE-G Repository
+
+[ACE-G Official Repository](https://github.com/nianticspatial/ace-g?utm_source=chatgpt.com)
+
+---
+# Educational and Research Purpose
+
+This repository is intended strictly for:
+
+- Educational purposes
+- Research experimentation
+- Learning visual relocalization pipelines
+- Understanding Scene Coordinate Regression systems
+
+This repository does NOT claim ownership of the ACE-G framework.
+
+All rights related to ACE-G belong to the original authors and contributors.
